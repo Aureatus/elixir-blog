@@ -1,18 +1,56 @@
-# Blog
+# Elixir Blog project
 
-To start your Phoenix server:
+- A dockyard curriculum project
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+# Technologies:
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+- Elixir
+- Phoenix
+- Ecto
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+# Project features:
 
-## Learn more
+- Posts, with a cover image
+- Users
+- Tags
+- Comments
+- Authentication + Authorization
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+# Entity relationship diagram
+
+```mermaid
+erDiagram
+User {
+  string username
+  string email
+  string password
+  string hashed_password
+  naive_datetime confirmed_at
+}
+
+Post {
+    string title
+    text content
+    date published_on
+    boolean visibility
+}
+
+CoverImage {
+    text url
+    id post_id
+}
+
+Comment {
+  text content
+  id post_id
+}
+
+Tag {
+    string name
+}
+
+User |O--O{ Post: ""
+Post }O--O{ Tag: ""
+Post ||--O{ Comment: ""
+Post ||--|| CoverImage: ""
+```
