@@ -1,5 +1,6 @@
 defmodule BlogWeb.Router do
   use BlogWeb, :router
+  alias PostController
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -18,6 +19,7 @@ defmodule BlogWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    resources "/posts", PostController
   end
 
   # Other scopes may use custom stacks.
