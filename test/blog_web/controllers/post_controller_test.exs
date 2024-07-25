@@ -4,13 +4,32 @@ defmodule BlogWeb.PostControllerTest do
   import Blog.PostsFixtures
 
   @create_attrs %{title: "some title", subtitle: "some subtitle", content: "some content"}
-  @update_attrs %{title: "some updated title", subtitle: "some updated subtitle", content: "some updated content"}
+  @update_attrs %{
+    title: "some updated title",
+    subtitle: "some updated subtitle",
+    content: "some updated content"
+  }
   @invalid_attrs %{title: nil, subtitle: nil, content: nil}
 
   describe "index" do
     test "lists all posts", %{conn: conn} do
       conn = get(conn, ~p"/posts")
       assert html_response(conn, 200) =~ "Listing Posts"
+    end
+
+    test "search returns correct result", %{conn: conn} do
+      post = post_fixture()
+      conn = get(conn, ~p"/posts", %{search_query: post.title})
+      assert html_response(conn, 200) =~ post.content
+
+      conn = get(conn, ~p"/posts", %{search_query: String.slice(post.title, 1..3)})
+      assert html_response(conn, 200) =~ post.content
+
+      conn = get(conn, ~p"/posts")
+      assert html_response(conn, 200) =~ post.content
+
+      conn = get(conn, ~p"/posts", %{search_query: "incorrect query"})
+      refute html_response(conn, 200) =~ post.content
     end
   end
 
