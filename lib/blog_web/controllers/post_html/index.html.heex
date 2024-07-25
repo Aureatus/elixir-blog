@@ -7,6 +7,10 @@
   </:actions>
 </.header>
 
+<.form :let={f} for={%{}} method="GET">
+  <.input field={f[:search_query]} value={@search_query} />
+</.form>
+
 <.table id="posts" rows={@posts} row_click={&JS.navigate(~p"/posts/#{&1}")}>
   <:col :let={post} label="Title"><%= post.title %></:col>
   <:col :let={post} label="Subtitle"><%= post.subtitle %></:col>
