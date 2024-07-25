@@ -10,9 +10,24 @@ defmodule Blog.PostsTest do
 
     @invalid_attrs %{title: nil, subtitle: nil, content: nil}
 
-    test "list_posts/0 returns all posts" do
+    test "list_posts/0 with no filter" do
       post = post_fixture()
       assert Posts.list_posts() == [post]
+    end
+
+    test "list_posts/1 filters post by input" do
+      post = post_fixture()
+      assert Posts.list_posts("") == [post]
+      assert Posts.list_posts(post.title) == [post]
+      assert Posts.list_posts(String.slice(post.title, 0..2)) == [post]
+      assert Posts.list_posts(String.upcase(post.title)) == [post]
+
+      assert Posts.list_posts("incorrect") == []
+    end
+
+    test "list_posts/1 with incorrect search returns no posts" do
+      _post = post_fixture()
+      assert Posts.list_posts("incorrect") == []
     end
 
     test "get_post!/1 returns the post with given id" do
@@ -35,7 +50,12 @@ defmodule Blog.PostsTest do
 
     test "update_post/2 with valid data updates the post" do
       post = post_fixture()
-      update_attrs = %{title: "some updated title", subtitle: "some updated subtitle", content: "some updated content"}
+
+      update_attrs = %{
+        title: "some updated title",
+        subtitle: "some updated subtitle",
+        content: "some updated content"
+      }
 
       assert {:ok, %Post{} = post} = Posts.update_post(post, update_attrs)
       assert post.title == "some updated title"
