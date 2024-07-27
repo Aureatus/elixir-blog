@@ -20,6 +20,7 @@ defmodule BlogWeb.Router do
 
     get "/", PageController, :home
     resources "/posts", PostController
+    resources "/comments", PostController, only: [:create]
   end
 
   # Other scopes may use custom stacks.

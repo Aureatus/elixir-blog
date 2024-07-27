@@ -2,6 +2,7 @@ defmodule BlogWeb.PostControllerTest do
   use BlogWeb.ConnCase
 
   import Blog.PostsFixtures
+  import Blog.CommentsFixtures
 
   @create_attrs %{
     title: "some title",
@@ -38,6 +39,22 @@ defmodule BlogWeb.PostControllerTest do
     end
   end
 
+  describe "show" do
+    test "displays post", %{conn: conn} do
+      post = post_fixture()
+      conn = get(conn, ~p"/posts/#{post.id}")
+      assert html_response(conn, 200) =~ "Post #{post.id}"
+    end
+
+    test "displays comments on post", %{conn: conn} do
+      post = post_fixture()
+      comment = comment_fixture(post_id: post.id)
+
+      conn = get(conn, ~p"/posts/#{post.id}")
+      assert html_response(conn, 200) =~ comment.content
+    end
+  end
+
   describe "new post" do
     test "renders form", %{conn: conn} do
       conn = get(conn, ~p"/posts/new")
@@ -59,6 +76,22 @@ defmodule BlogWeb.PostControllerTest do
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, ~p"/posts", post: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Post"
+    end
+  end
+
+  describe "create comment" do
+    test "redirects to show when data is valid", %{conn: conn} do
+      post = post_fixture(@create_attrs)
+      comment = %{post_id: post.id, content: "Testing comment"}
+      conn = post(conn, ~p"/comments", comment: comment)
+
+      conn = get(conn, ~p"/posts/#{post.id}")
+      assert html_response(conn, 200) =~ comment.content
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      conn = post(conn, ~p"/posts", post: @invalid_attrs)
+      assert html_response(conn, 200) =~ "Oops, something went wrong!"
     end
   end
 

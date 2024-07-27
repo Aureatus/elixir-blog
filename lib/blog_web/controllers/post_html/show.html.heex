@@ -1,17 +1,41 @@
-<.header>
-  Post <%= @post.id %>
-  <:subtitle>This is a post record from your database.</:subtitle>
-  <:actions>
-    <.link href={~p"/posts/#{@post}/edit"}>
-      <.button>Edit post</.button>
-    </.link>
-  </:actions>
-</.header>
+<section>
+  <.header>
+    Post <%= @post.id %>
+    <:subtitle>This is a post record from your database.</:subtitle>
+    <:actions>
+      <.link href={~p"/posts/#{@post}/edit"}>
+        <.button>Edit post</.button>
+      </.link>
+    </:actions>
+  </.header>
 
-<.list>
-  <:item title="Title"><%= @post.title %></:item>
-  <:item title="Content"><%= @post.content %></:item>
-  <:item title="Published"><%= @post.published_on %></:item>
-</.list>
+  <.list>
+    <:item title="Title"><%= @post.title %></:item>
+    <:item title="Content"><%= @post.content %></:item>
+    <:item title="Published"><%= @post.published_on %></:item>
+  </.list>
+</section>
+<br />
+<section>
+  <.header>Comments</.header>
+
+  <ul>
+    <%= for comment <- @post.comments do %>
+      <li><%= comment.content %></li>
+    <% end %>
+  </ul>
+
+  <.simple_form :let={f} for={@comment_changeset} action={~p"/comments"}>
+    <.error :if={@comment_changeset.action}>
+      Oops, something went wrong! Please check the errors below.
+    </.error>
+    <.input field={f[:post_id]} type="hidden" value={@post.id} />
+    <.input field={f[:content]} type="text" label="Add Comment" />
+
+    <:actions>
+      <.button>Comment</.button>
+    </:actions>
+  </.simple_form>
+</section>
 
 <.back navigate={~p"/posts"}>Back to posts</.back>

@@ -1,6 +1,8 @@
 defmodule BlogWeb.PostController do
   use BlogWeb, :controller
 
+  alias Blog.Comments
+  alias Blog.Comments.Comment
   alias Blog.Posts
   alias Blog.Posts.Post
 
@@ -27,9 +29,22 @@ defmodule BlogWeb.PostController do
     end
   end
 
+  def create(conn, %{"comment" => comment_params}) do
+    case Comments.create_comment(comment_params) do
+      {:ok, _comment} ->
+        conn
+        |> put_flash(:info, "Comment created successfully.")
+        |> redirect(to: ~p"/posts/#{comment_params["post_id"]}")
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        post = Posts.get_post!(comment_params["post_id"])
+        render(conn, :show, post: post, comment_changeset: changeset)
+    end
+  end
+
   def show(conn, %{"id" => id}) do
     post = Posts.get_post!(id)
-    render(conn, :show, post: post)
+    render(conn, :show, post: post, comment_changeset: Comments.change_comment(%Comment{}))
   end
 
   def edit(conn, %{"id" => id}) do
