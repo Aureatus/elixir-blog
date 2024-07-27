@@ -20,7 +20,10 @@ defmodule Blog.Posts do
   def list_posts(search_phrase \\ "") do
     query =
       from p in Post,
-        where: p.title |> ilike(^"%#{search_phrase}%")
+        where:
+          p.title |> ilike(^"%#{search_phrase}%") and p.visible == true and
+            p.published_on <= ^DateTime.utc_now(),
+        order_by: [desc: p.published_on]
 
     Repo.all(query)
   end
