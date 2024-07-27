@@ -3,7 +3,12 @@ defmodule BlogWeb.PostControllerTest do
 
   import Blog.PostsFixtures
 
-  @create_attrs %{title: "some title", subtitle: "some subtitle", content: "some content"}
+  @create_attrs %{
+    title: "some title",
+    content: "some content",
+    visible: true,
+    published_on: DateTime.utc_now()
+  }
   @update_attrs %{
     title: "some updated title",
     subtitle: "some updated subtitle",

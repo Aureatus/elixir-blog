@@ -15,6 +15,47 @@ defmodule Blog.PostsTest do
       assert Posts.list_posts() == [post]
     end
 
+    test "list_posts/0 respects visible field" do
+      post1 = post_fixture(title: "title1", visible: true)
+      _post2 = post_fixture(title: "title2", visible: false)
+      assert Posts.list_posts() == [post1]
+    end
+
+    test "list_posts/0 respects publish date based visibility" do
+      _post =
+        post_fixture(
+          title: "title1",
+          visible: true,
+          published_on: DateTime.utc_now() |> DateTime.add(1, :day)
+        )
+
+      assert Posts.list_posts() == []
+    end
+
+    test "list_posts/0 respects publish date ordering" do
+      post1 =
+        post_fixture(
+          title: "title1",
+          published_on: DateTime.utc_now() |> DateTime.add(-3, :day)
+        )
+
+      post2 =
+        post_fixture(
+          title: "title2",
+          visible: true,
+          published_on: DateTime.utc_now() |> DateTime.add(-2, :day)
+        )
+
+      post3 =
+        post_fixture(
+          title: "title3",
+          visible: true,
+          published_on: DateTime.utc_now() |> DateTime.add(-1, :day)
+        )
+
+      assert Posts.list_posts() == [post3, post2, post1]
+    end
+
     test "list_posts/1 filters post by input" do
       post = post_fixture()
       assert Posts.list_posts("") == [post]
@@ -36,12 +77,20 @@ defmodule Blog.PostsTest do
     end
 
     test "create_post/1 with valid data creates a post" do
-      valid_attrs = %{title: "some title", subtitle: "some subtitle", content: "some content"}
+      time = DateTime.utc_now()
+
+      valid_attrs = %{
+        title: "some title",
+        content: "some content",
+        visible: false,
+        published_on: time
+      }
 
       assert {:ok, %Post{} = post} = Posts.create_post(valid_attrs)
       assert post.title == "some title"
-      assert post.subtitle == "some subtitle"
       assert post.content == "some content"
+      assert post.visible == false
+      assert DateTime.compare(time, valid_attrs.published_on) == :eq
     end
 
     test "create_post/1 with invalid data returns error changeset" do
@@ -53,14 +102,14 @@ defmodule Blog.PostsTest do
 
       update_attrs = %{
         title: "some updated title",
-        subtitle: "some updated subtitle",
-        content: "some updated content"
+        content: "some updated content",
+        visible: false
       }
 
       assert {:ok, %Post{} = post} = Posts.update_post(post, update_attrs)
       assert post.title == "some updated title"
-      assert post.subtitle == "some updated subtitle"
       assert post.content == "some updated content"
+      assert post.visible == false
     end
 
     test "update_post/2 with invalid data returns error changeset" do
